@@ -23,7 +23,7 @@ const initialState:InitialState = {
             description: "Create github repo, and actions",
             dueDate: "2026-11",
             isComplete: false,
-            priority: "High",
+            priority: "Medium",
         }
     ],
     filter: "all",
