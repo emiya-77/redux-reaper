@@ -17,12 +17,21 @@ import {
 } from "@/components/ui/dialog"
 import {
   Field,
+  FieldContent,
+  FieldDescription,
   FieldError,
   FieldGroup,
   FieldLabel,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { InputGroupTextarea } from "@/components/ui/input-group"
+import { InputGroup, InputGroupAddon, InputGroupText, InputGroupTextarea } from "@/components/ui/input-group"
+import { Select, SelectContent, SelectItem, SelectSeparator, SelectTrigger, SelectValue } from "@/components/ui/select"
+
+const priorities = [
+  { value: "High", label: "High" },
+  { value: "Medium", label: "Medium" },
+  { value: "Low", label: "Low" },
+] as const;
 
 const formSchema = z.object({
   title: z
@@ -33,6 +42,7 @@ const formSchema = z.object({
     .string()
     .max(200, "Description cannot exceed 200 characters.")
     .optional(),
+  priority: z.enum(["High", "Medium", "Low"])
 })
 
 type FormData = z.infer<typeof formSchema>
@@ -43,6 +53,7 @@ export function AddTaskModal() {
     defaultValues: {
       title: "",
       description: "",
+      priority: "Low"
     },
   })
 
@@ -90,39 +101,87 @@ export function AddTaskModal() {
               )}
             />
 
-            <Controller
-              name="description"
-              control={form.control}
+            <Controller 
+              name="description" 
+              control={form.control} 
               render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel>Description</FieldLabel>
-
-                  <InputGroupTextarea
-                    {...field}
-                    rows={4}
-                    placeholder="Add some details..."
-                    className="resize-none"
-                    aria-invalid={fieldState.invalid}
-                  />
-
+                <Field data-invalid={fieldState.invalid}> 
+                  <FieldLabel htmlFor="form-rhf-demo-description"> 
+                    Description 
+                  </FieldLabel> 
+                  <InputGroup> 
+                    <InputGroupTextarea 
+                      {...field} 
+                      id="form-rhf-demo-description" 
+                      placeholder="I'm having an issue with the login button on mobile." 
+                      rows={6} 
+                      className="min-h-24 resize-none" 
+                      aria-invalid={fieldState.invalid} 
+                    /> 
+                    <InputGroupAddon align="block-end"> 
+                      <InputGroupText className="tabular-nums"> 
+                        {field.value.length}/100 characters 
+                      </InputGroupText> 
+                    </InputGroupAddon> 
+                  </InputGroup>
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
                   )}
+                </Field>)} 
+              />
+
+            <Controller
+              name="priority"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field
+                  orientation="responsive"
+                  data-invalid={fieldState.invalid}
+                >
+                  <FieldContent>
+                    <FieldLabel htmlFor="form-rhf-select-priority">
+                      Priority
+                    </FieldLabel>
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </FieldContent>
+                  <Select
+                    name={field.name}
+                    value={field.value}
+                    onValueChange={field.onChange}
+                  >
+                    <SelectTrigger
+                      id="form-rhf-select-priority"
+                      aria-invalid={fieldState.invalid}
+                      className="min-w-[120px]"
+                    >
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent position="item-aligned" className="-mt-32">
+                      {priorities.map((priority) => (
+                        <SelectItem key={priority.value} value={priority.value}>
+                          {priority.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </Field>
               )}
             />
           </FieldGroup>
 
           <DialogFooter>
-            <DialogClose asChild>
-              <Button type="button" variant="outline">
-                Cancel
+            <div className="flex justify-end gap-4">
+              <DialogClose asChild>
+                <Button type="button" variant="outline">
+                  Cancel
+                </Button>
+              </DialogClose>
+              <Button type="submit">
+                Add Task
               </Button>
-            </DialogClose>
-
-            <Button type="submit">
-              Add Task
-            </Button>
+            </div>
           </DialogFooter>
         </form>
       </DialogContent>
