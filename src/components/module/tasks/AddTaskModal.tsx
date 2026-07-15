@@ -4,159 +4,128 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { Controller, useForm } from "react-hook-form"
 import { toast } from "sonner"
 import * as z from "zod"
+
 import { Button } from "@/components/ui/button"
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import {
-    Dialog,
-    DialogContent,
-    DialogTrigger,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogTrigger,
+  DialogClose,
 } from "@/components/ui/dialog"
 import {
   Field,
-  FieldDescription,
   FieldError,
   FieldGroup,
   FieldLabel,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupText,
-  InputGroupTextarea,
-} from "@/components/ui/input-group"
-
+import { InputGroupTextarea } from "@/components/ui/input-group"
 
 const formSchema = z.object({
   title: z
     .string()
-    .min(5, "Bug title must be at least 5 characters.")
-    .max(32, "Bug title must be at most 32 characters."),
+    .min(3, "Title must be at least 3 characters.")
+    .max(50, "Title cannot exceed 50 characters."),
   description: z
     .string()
-    .min(20, "Description must be at least 20 characters.")
-    .max(100, "Description must be at most 100 characters."),
+    .max(200, "Description cannot exceed 200 characters.")
+    .optional(),
 })
 
+type FormData = z.infer<typeof formSchema>
+
 export function AddTaskModal() {
-    const form = useForm<z.infer<typeof formSchema>>({
-        resolver: zodResolver(formSchema),
-        defaultValues: {
-            title: "",
-            description: "",
-        },
-    })
+  const form = useForm<FormData>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      title: "",
+      description: "",
+    },
+  })
 
-    function onSubmit(data: z.infer<typeof formSchema>) {
-        toast("You submitted the following values:", {
-            description: (
-                <pre className="mt-2 w-[320px] overflow-x-auto rounded-md bg-code p-4 text-code-foreground">
-                <code>{JSON.stringify(data, null, 2)}</code>
-                </pre>
-            ),
-            position: "bottom-right",
-            classNames: {
-                content: "flex flex-col gap-2",
-            },
-            style: {
-                "--border-radius": "calc(var(--radius)  + 4px)",
-            } as React.CSSProperties,
-        })
-    }
+  function onSubmit(data: FormData) {
+    console.log(data)
 
-    return (
-        <Dialog>
-            <DialogTrigger render={<Button variant="outline">Add Task</Button>} />
-            <DialogContent className="sm:max-w-sm">
-                <Card className="w-full sm:max-w-md">
-                    <CardHeader>
-                        <CardTitle>Bug Report</CardTitle>
-                        <CardDescription>
-                            Help us improve by reporting bugs you encounter.
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <form 
-                            id="form-rhf-demo" 
-                            onSubmit={form.handleSubmit(onSubmit)}
-                        >
-                            <FieldGroup>
-                                <Controller
-                                    name="title"
-                                    control={form.control}
-                                    render={({ field, fieldState }) => (
-                                        <Field data-invalid={fieldState.invalid}>
-                                            <FieldLabel htmlFor="form-rhf-demo-title">
-                                                Bug Title
-                                            </FieldLabel>
-                                            <Input
-                                                {...field}
-                                                id="form-rhf-demo-title"
-                                                aria-invalid={fieldState.invalid}
-                                                placeholder="Login button not working on mobile"
-                                                autoComplete="off"
-                                            />
-                                            {fieldState.invalid && (
-                                                <FieldError errors={[fieldState.error]} />
-                                            )}
-                                        </Field>
-                                    )}
-                                />
-                                <Controller
-                                    name="description"
-                                    control={form.control}
-                                    render={({ field, fieldState }) => (
-                                        <Field data-invalid={fieldState.invalid}>
-                                            <FieldLabel htmlFor="form-rhf-demo-description">
-                                                Description
-                                            </FieldLabel>
-                                            <InputGroup>
-                                                <InputGroupTextarea
-                                                    {...field}
-                                                    id="form-rhf-demo-description"
-                                                    placeholder="I'm having an issue with the login button on mobile."
-                                                    rows={6}
-                                                    className="min-h-24 resize-none"
-                                                    aria-invalid={fieldState.invalid}
-                                                />
-                                                <InputGroupAddon align="block-end">
-                                                    <InputGroupText className="tabular-nums">
-                                                        {field.value.length}/100 characters
-                                                    </InputGroupText>
-                                                </InputGroupAddon>
-                                            </InputGroup>
-                                            <FieldDescription>
-                                                Include steps to reproduce, expected behavior, and what
-                                                actually happened.
-                                            </FieldDescription>
-                                            {fieldState.invalid && (
-                                                <FieldError errors={[fieldState.error]} />
-                                            )}
-                                        </Field>
-                                    )}
-                                />
-                            </FieldGroup>
-                        </form>
-                    </CardContent>
-                    <CardFooter>
-                        <Field orientation="horizontal">
-                            <Button type="button" variant="outline" onClick={() => form.reset()}>
-                                Reset
-                            </Button>
-                            <Button type="submit" form="form-rhf-demo">
-                                Submit
-                            </Button>
-                        </Field>
-                    </CardFooter>
-                </Card>
-            </DialogContent>
-        </Dialog>
-    )
+    toast.success("Task added successfully!")
+
+    form.reset()
+  }
+
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button>Add Task</Button>
+      </DialogTrigger>
+
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Add Task</DialogTitle>
+        </DialogHeader>
+
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="space-y-6"
+        >
+          <FieldGroup>
+            <Controller
+              name="title"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel>Title</FieldLabel>
+
+                  <Input
+                    {...field}
+                    placeholder="Finish Redux project"
+                    aria-invalid={fieldState.invalid}
+                  />
+
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+
+            <Controller
+              name="description"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel>Description</FieldLabel>
+
+                  <InputGroupTextarea
+                    {...field}
+                    rows={4}
+                    placeholder="Add some details..."
+                    className="resize-none"
+                    aria-invalid={fieldState.invalid}
+                  />
+
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+          </FieldGroup>
+
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button type="button" variant="outline">
+                Cancel
+              </Button>
+            </DialogClose>
+
+            <Button type="submit">
+              Add Task
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  )
 }
