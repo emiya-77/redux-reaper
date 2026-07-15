@@ -1,12 +1,14 @@
+import type { RootState } from "@/redux/store";
 import type { ITask } from "@/types";
 import { createSlice } from "@reduxjs/toolkit";
 
 interface InitialState {
-    task: ITask[];
+    tasks: ITask[];
+    filter: "all" | "high" | "medium" | "low";
 }
 
 const initialState:InitialState = {
-    task: [
+    tasks: [
         {
             id: "asdfasdfasdf",
             title: "Initialize frontend",
@@ -23,16 +25,25 @@ const initialState:InitialState = {
             isComplete: false,
             priority: "High",
         }
-    ]
+    ],
+    filter: "all",
 }
 
 const taskSlice = createSlice({
-    name: "task",
+    name: "tasks",
     initialState,
     reducers: {
 
     }
 })
+
+export const selectTasks = (state: RootState) => {
+    return state.todo.tasks;
+}
+
+export const filterTasks = (state: RootState) => {
+    return state.todo.filter;
+}
 
 // export {} = taskSlice.actions
 export default taskSlice.reducer;
