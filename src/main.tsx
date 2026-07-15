@@ -7,12 +7,14 @@ import { RouterProvider } from "react-router"
 import router from "./routes/index.tsx"
 import { Provider } from "react-redux"
 import { store } from "./redux/store.ts"
+import { Toaster } from "sonner"
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <ThemeProvider>
       <Provider store={store}>
         <RouterProvider router={router} />
+        <Toaster />
       </Provider>
     </ThemeProvider>
   </StrictMode>
