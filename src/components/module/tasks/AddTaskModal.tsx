@@ -34,9 +34,9 @@ import { addTask } from "@/redux/features/task/taskSlice"
 import type { ITask } from "@/types"
 
 const priorities = [
-  { value: "High", label: "High" },
-  { value: "Medium", label: "Medium" },
-  { value: "Low", label: "Low" },
+  { value: "high", label: "High" },
+  { value: "medium", label: "Medium" },
+  { value: "low", label: "Low" },
 ] as const;
 
 const formSchema = z.object({

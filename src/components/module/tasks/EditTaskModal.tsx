@@ -30,13 +30,13 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar1, Edit } from "lucide-react"
 import { Calendar } from "@/components/ui/calendar"
 import { useAppDispatch } from "@/redux/hook"
-import { addTask, updateTask } from "@/redux/features/task/taskSlice"
+import { updateTask } from "@/redux/features/task/taskSlice"
 import type { ITask } from "@/types"
 
 const priorities = [
-  { value: "High", label: "High" },
-  { value: "Medium", label: "Medium" },
-  { value: "Low", label: "Low" },
+  { value: "high", label: "High" },
+  { value: "medium", label: "Medium" },
+  { value: "low", label: "Low" },
 ] as const;
 
 const formSchema = z.object({

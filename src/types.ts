@@ -5,5 +5,10 @@ export interface ITask {
     description: string;
     dueDate: Date;
     isComplete: boolean;
-    priority: "High" | "Medium" | "Low";
+    priority: "high" | "medium" | "low";
+}
+
+export interface IUser {
+    id: string;
+    name: string;
 }
