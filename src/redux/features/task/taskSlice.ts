@@ -1,7 +1,6 @@
 import type { RootState } from "@/redux/store";
 import type { ITask } from "@/types";
 import { createSlice, type PayloadAction, nanoid } from "@reduxjs/toolkit";
-import { v4 as uuidv4 } from 'uuid';
 
 interface InitialState {
     tasks: ITask[];
