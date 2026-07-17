@@ -27,10 +27,10 @@ import { InputGroup, InputGroupAddon, InputGroupText, InputGroupTextarea } from 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { format } from "date-fns"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Calendar1 } from "lucide-react"
+import { Calendar1, Edit } from "lucide-react"
 import { Calendar } from "@/components/ui/calendar"
 import { useAppDispatch } from "@/redux/hook"
-import { addTask } from "@/redux/features/task/taskSlice"
+import { addTask, updateTask } from "@/redux/features/task/taskSlice"
 import type { ITask } from "@/types"
 
 const priorities = [
@@ -54,14 +54,18 @@ const formSchema = z.object({
 
 type FormData = z.infer<typeof formSchema>
 
-export function AddTaskModal() {
+interface EditTaskModalProps {
+  task: ITask;
+}
+
+export function EditTaskModal({task}: EditTaskModalProps) {
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      title: "",
-      description: "",
-      priority: "Low",
-      dueDate: undefined,
+      title: task.title,
+      description: task.description,
+      priority: task.priority,
+      dueDate: task.dueDate,
     },
   })
 
@@ -69,9 +73,14 @@ export function AddTaskModal() {
 
   const onSubmit: SubmitHandler<FieldValues> = (data) => {
     console.log(data)
-    dispatch(addTask(data as ITask))
+    dispatch(updateTask(
+      {
+        ...task,
+        ...data
+      } as ITask)
+    )
 
-    toast.success("Task added successfully!")
+    toast.success("Task updated successfully!")
 
     form.reset()
   }
@@ -79,12 +88,17 @@ export function AddTaskModal() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button className="cursor-pointer">Add Task</Button>
+        <Button 
+            variant="link"
+            className="p-0 text-gray-400 hover:text-gray-300 cursor-pointer"
+        >
+            <Edit/>
+        </Button>
       </DialogTrigger>
 
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Add Task</DialogTitle>
+          <DialogTitle>Edit Task</DialogTitle>
         </DialogHeader>
 
         <form
@@ -234,7 +248,7 @@ export function AddTaskModal() {
                 </Button>
               </DialogClose>
               <Button type="submit">
-                Add Task
+                Save Changes
               </Button>
             </div>
           </DialogFooter>

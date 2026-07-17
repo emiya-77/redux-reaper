@@ -4,7 +4,8 @@ import { cn } from "@/lib/utils";
 import { deleteTask, toggleCompleteState } from "@/redux/features/task/taskSlice";
 import { useAppDispatch } from "@/redux/hook";
 import type { ITask } from "@/types"
-import { Trash2 } from "lucide-react"
+import { Edit, Trash2 } from "lucide-react"
+import { EditTaskModal } from "./EditTaskModal";
 
 interface IProps {
     task: ITask;
@@ -28,15 +29,17 @@ const TaskCard = ({ task }: IProps) => {
                 <div className="flex gap-3 items-center">
                     <Button 
                         variant="link"
-                        className="p-0 text-red-500"
+                        className="p-0 text-red-500 cursor-pointer"
                         onClick={() => dispatch(deleteTask(task.id))}
                     >
                         <Trash2/>
                     </Button>
                     <Checkbox 
                         checked={task.isComplete}
-                        onClick={() => dispatch(toggleCompleteState(task.id))} 
+                        onClick={() => dispatch(toggleCompleteState(task.id))}
+                        className="cursor-pointer" 
                     />
+                    <EditTaskModal task={task} />
                 </div>
             </div>
             <p className="mt-5">{task.description}</p>
