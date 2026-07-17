@@ -1,7 +1,7 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Controller, useForm } from "react-hook-form"
+import { Controller, useForm, type FieldValue, type FieldValues, type SubmitHandler } from "react-hook-form"
 import { toast } from "sonner"
 import * as z from "zod"
 
@@ -18,14 +18,20 @@ import {
 import {
   Field,
   FieldContent,
-  FieldDescription,
   FieldError,
   FieldGroup,
   FieldLabel,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { InputGroup, InputGroupAddon, InputGroupText, InputGroupTextarea } from "@/components/ui/input-group"
-import { Select, SelectContent, SelectItem, SelectSeparator, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { format } from "date-fns"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Calendar1 } from "lucide-react"
+import { Calendar } from "@/components/ui/calendar"
+import { useAppDispatch } from "@/redux/hook"
+import { addTask } from "@/redux/features/task/taskSlice"
+import type { ITask } from "@/types"
 
 const priorities = [
   { value: "High", label: "High" },
@@ -42,7 +48,8 @@ const formSchema = z.object({
     .string()
     .max(200, "Description cannot exceed 200 characters.")
     .optional(),
-  priority: z.enum(["High", "Medium", "Low"])
+  priority: z.enum(["High", "Medium", "Low"]),
+  dueDate: z.date()
 })
 
 type FormData = z.infer<typeof formSchema>
@@ -53,12 +60,16 @@ export function AddTaskModal() {
     defaultValues: {
       title: "",
       description: "",
-      priority: "Low"
+      priority: "Low",
+      dueDate: undefined,
     },
   })
 
-  function onSubmit(data: FormData) {
+  const dispatch = useAppDispatch();
+
+  const onSubmit: SubmitHandler<FieldValues> = (data) => {
     console.log(data)
+    dispatch(addTask(data as ITask))
 
     toast.success("Task added successfully!")
 
@@ -166,6 +177,50 @@ export function AddTaskModal() {
                       ))}
                     </SelectContent>
                   </Select>
+                </Field>
+              )}
+            />
+
+            <Controller
+              name="dueDate"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel>Due Date</FieldLabel>
+
+                  <Popover>
+                    <PopoverTrigger
+                      render={
+                        <Button
+                          variant="outline"
+                          data-empty={!field.value}
+                          className="w-full justify-between text-left font-normal data-[empty=true]:text-muted-foreground"
+                          aria-invalid={fieldState.invalid}
+                        >
+                          {field.value ? (
+                            format(field.value, "PPP")
+                          ) : (
+                            <span>Pick a due date</span>
+                          )}
+
+                          <Calendar1 />
+                        </Button>
+                      }
+                    />
+
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={field.value}
+                        onSelect={field.onChange}
+                        defaultMonth={field.value}
+                      />
+                    </PopoverContent>
+                  </Popover>
+
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
                 </Field>
               )}
             />
