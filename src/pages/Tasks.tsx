@@ -13,7 +13,12 @@ const Tasks = () => {
 
     // console.log(tasks)
 
-    const {data, isLoading, isError} = useGetTasksQuery(undefined);
+    const {data, isLoading, isError} = useGetTasksQuery(undefined, {
+        pollingInterval: 60000,
+        refetchOnFocus: true,
+        refetchOnMountOrArgChange: true,
+        refetchOnReconnect: true,
+    });
 
     console.log({data, isLoading, isError})
 
