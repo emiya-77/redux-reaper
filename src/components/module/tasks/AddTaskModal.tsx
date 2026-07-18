@@ -1,7 +1,7 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Controller, useForm, type FieldValue, type FieldValues, type SubmitHandler } from "react-hook-form"
+import { Controller, useForm, type FieldValues, type SubmitHandler } from "react-hook-form"
 import { toast } from "sonner"
 import * as z from "zod"
 
@@ -29,9 +29,11 @@ import { format } from "date-fns"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Calendar1 } from "lucide-react"
 import { Calendar } from "@/components/ui/calendar"
-import { useAppDispatch } from "@/redux/hook"
+import { useAppDispatch, useAppSelector } from "@/redux/hook"
 import { addTask } from "@/redux/features/task/taskSlice"
 import type { ITask } from "@/types"
+import { selectUsers } from "@/redux/features/user/userSlice"
+import { useState } from "react"
 
 const priorities = [
   { value: "high", label: "High" },
@@ -48,23 +50,28 @@ const formSchema = z.object({
     .string()
     .max(200, "Description cannot exceed 200 characters.")
     .optional(),
-  priority: z.enum(["High", "Medium", "Low"]),
-  dueDate: z.date()
+  priority: z.enum(["high", "medium", "low"]),
+  dueDate: z.date(),
+  assignedTo: z.string().optional(),
 })
 
 type FormData = z.infer<typeof formSchema>
 
 export function AddTaskModal() {
+  const [open, setOpen] = useState(false);
+
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: "",
       description: "",
-      priority: "Low",
+      priority: "low",
       dueDate: undefined,
+      assignedTo: undefined,
     },
   })
 
+  const users = useAppSelector(selectUsers);
   const dispatch = useAppDispatch();
 
   const onSubmit: SubmitHandler<FieldValues> = (data) => {
@@ -72,12 +79,12 @@ export function AddTaskModal() {
     dispatch(addTask(data as ITask))
 
     toast.success("Task added successfully!")
-
+    setOpen(false);
     form.reset()
   }
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button className="cursor-pointer">Add Task</Button>
       </DialogTrigger>
@@ -138,8 +145,9 @@ export function AddTaskModal() {
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
                   )}
-                </Field>)} 
-              />
+                </Field>
+              )} 
+            />
 
             <Controller
               name="priority"
@@ -173,6 +181,46 @@ export function AddTaskModal() {
                       {priorities.map((priority) => (
                         <SelectItem key={priority.value} value={priority.value}>
                           {priority.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </Field>
+              )}
+            />
+
+            <Controller
+              name="assignedTo"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field
+                  orientation="responsive"
+                  data-invalid={fieldState.invalid}
+                >
+                  <FieldContent>
+                    <FieldLabel htmlFor="form-rhf-select-priority">
+                      Assign To
+                    </FieldLabel>
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </FieldContent>
+                  <Select
+                    name={field.name}
+                    value={field.value}
+                    onValueChange={field.onChange}
+                  >
+                    <SelectTrigger
+                      id="form-rhf-select-priority"
+                      aria-invalid={fieldState.invalid}
+                      className="min-w-[120px]"
+                    >
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent position="item-aligned" className="-mt-32">
+                      {users.map((user) => (
+                        <SelectItem key={user.id} value={user.id}>
+                          {user.name}
                         </SelectItem>
                       ))}
                     </SelectContent>

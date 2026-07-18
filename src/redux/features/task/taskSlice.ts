@@ -16,6 +16,7 @@ const initialState:InitialState = {
             dueDate: new Date("2026-11-02"),
             isComplete: false,
             priority: "high",
+            assignedTo: "yqmNdM4MNDOMv1Pa4cJ5C",
         },
         {
             id: "dlkjlkjlksjd",
@@ -24,6 +25,7 @@ const initialState:InitialState = {
             dueDate: new Date("2026-11"),
             isComplete: false,
             priority: "medium",
+            assignedTo: "",
         }
     ],
     filter: "all",

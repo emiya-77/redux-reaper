@@ -29,9 +29,11 @@ import { format } from "date-fns"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Calendar1, Edit } from "lucide-react"
 import { Calendar } from "@/components/ui/calendar"
-import { useAppDispatch } from "@/redux/hook"
+import { useAppDispatch, useAppSelector } from "@/redux/hook"
 import { updateTask } from "@/redux/features/task/taskSlice"
 import type { ITask } from "@/types"
+import { selectUsers } from "@/redux/features/user/userSlice"
+import { useState } from "react"
 
 const priorities = [
   { value: "high", label: "High" },
@@ -48,8 +50,9 @@ const formSchema = z.object({
     .string()
     .max(200, "Description cannot exceed 200 characters.")
     .optional(),
-  priority: z.enum(["High", "Medium", "Low"]),
-  dueDate: z.date()
+  priority: z.enum(["high", "medium", "low"]),
+  dueDate: z.date(),
+  assignedTo: z.string().optional(),
 })
 
 type FormData = z.infer<typeof formSchema>
@@ -59,6 +62,8 @@ interface EditTaskModalProps {
 }
 
 export function EditTaskModal({task}: EditTaskModalProps) {
+  const [open, setOpen] = useState(false);
+  
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -66,9 +71,11 @@ export function EditTaskModal({task}: EditTaskModalProps) {
       description: task.description,
       priority: task.priority,
       dueDate: task.dueDate,
+      assignedTo: task.assignedTo
     },
   })
 
+  const users = useAppSelector(selectUsers);
   const dispatch = useAppDispatch();
 
   const onSubmit: SubmitHandler<FieldValues> = (data) => {
@@ -81,7 +88,7 @@ export function EditTaskModal({task}: EditTaskModalProps) {
     )
 
     toast.success("Task updated successfully!")
-
+    setOpen(false)
     form.reset()
   }
 
@@ -187,6 +194,49 @@ export function EditTaskModal({task}: EditTaskModalProps) {
                       {priorities.map((priority) => (
                         <SelectItem key={priority.value} value={priority.value}>
                           {priority.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </Field>
+              )}
+            />
+
+            <Controller
+              name="assignedTo"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field
+                  orientation="responsive"
+                  data-invalid={fieldState.invalid}
+                >
+                  <FieldContent>
+                    <FieldLabel htmlFor="form-rhf-select-priority">
+                      Assign To
+                    </FieldLabel>
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </FieldContent>
+                  <Select
+                    name={field.name}
+                    value={field.value}
+                    onValueChange={field.onChange}
+                  >
+                    <SelectTrigger
+                      id="form-rhf-select-priority"
+                      aria-invalid={fieldState.invalid}
+                      className="min-w-[120px]"
+                    >
+                      <SelectValue placeholder="Select">
+                        {users.find(user => user.id === field.value)?.name ?? "Select"}
+                      </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent position="item-aligned" className="-mt-32">
+                      <SelectItem value={undefined}>Select</SelectItem>
+                      {users.map((user) => (
+                        <SelectItem key={user.id} value={user.id}>
+                          {user.name}
                         </SelectItem>
                       ))}
                     </SelectContent>

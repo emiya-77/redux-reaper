@@ -1,27 +1,27 @@
-import { useRef, useState } from "react";
+import { AddUserModal } from "@/components/module/users/AddUserModal";
+import UserTaskCard from "@/components/module/users/UserTaskCard";
+import { selectUsers } from "@/redux/features/user/userSlice";
+import { useAppSelector } from "@/redux/hook";
 
 const User = () => {
-    const ref = useRef<HTMLInputElement>(null)
-    console.log("Rendered", ref.current?.value)
+    const users = useAppSelector(selectUsers);
+    console.log(users);
+
     return (
-        <div className="border p-6 max-w-7xl mx-auto mt-20">
-            <input className="bg-gray-700 rounded border-2 border-gray-400" ref={ref} />
+        <div className="mx-auto max-w-7xl px-5 mt-20">
+            <div className="flex justify-end items-center gap-5">
+                <h1 className="mr-auto">Users</h1>
+                <AddUserModal />
+            </div>
+            <div className="grid grid-cols-3 gap-4 space-y-5 mt-5">
+                {
+                    users.map(user => (
+                        <UserTaskCard user={user} key={user.id} />
+                    ))
+                }
+            </div>
         </div>
     )
 }
-
-// const User = () => {
-//     const [value, setValue] = useState("");
-//     console.log("Rendered")
-//     return (
-//         <div className="border p-6 max-w-7xl mx-auto mt-20">
-//             <input
-//                 value={value}
-//                 onChange={(e) => setValue(e.target.value)}
-//                 className="bg-gray-700 rounded border-2 border-gray-400"
-//             />
-//         </div>
-//     )
-// }
 
 export default User;
