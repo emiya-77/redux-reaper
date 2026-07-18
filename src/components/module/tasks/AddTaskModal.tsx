@@ -34,6 +34,7 @@ import { addTask } from "@/redux/features/task/taskSlice"
 import type { ITask } from "@/types"
 import { selectUsers } from "@/redux/features/user/userSlice"
 import { useState } from "react"
+import { useCreateTaskMutation } from "@/redux/api/baseApi"
 
 const priorities = [
   { value: "high", label: "High" },
@@ -74,9 +75,21 @@ export function AddTaskModal() {
   const users = useAppSelector(selectUsers);
   const dispatch = useAppDispatch();
 
-  const onSubmit: SubmitHandler<FieldValues> = (data) => {
+  const [createTask, {data, isLoading, isError}] = useCreateTaskMutation()
+
+  console.log("Data", data);
+
+  const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     console.log(data)
-    dispatch(addTask(data as ITask))
+    // dispatch(addTask(data as ITask))
+    const taskData = {
+      ...data,
+      isComplete: false,
+    }
+
+    const res = await createTask(taskData);
+
+    console.log("Inside submit function: ", res);
 
     toast.success("Task added successfully!")
     setOpen(false);
