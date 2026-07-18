@@ -52,7 +52,7 @@ const formSchema = z.object({
     .optional(),
   priority: z.enum(["high", "medium", "low"]),
   dueDate: z.date(),
-  assignedTo: z.string().optional(),
+  assignedTo: z.string().nullable().optional(),
 })
 
 type FormData = z.infer<typeof formSchema>
@@ -67,7 +67,7 @@ export function AddTaskModal() {
       description: "",
       priority: "low",
       dueDate: undefined,
-      assignedTo: undefined,
+      assignedTo: null,
     },
   })
 

@@ -52,7 +52,7 @@ const formSchema = z.object({
     .optional(),
   priority: z.enum(["high", "medium", "low"]),
   dueDate: z.date(),
-  assignedTo: z.string().optional(),
+  assignedTo: z.string().nullable().optional(),
 })
 
 type FormData = z.infer<typeof formSchema>
@@ -233,7 +233,7 @@ export function EditTaskModal({task}: EditTaskModalProps) {
                       </SelectValue>
                     </SelectTrigger>
                     <SelectContent position="item-aligned" className="-mt-32">
-                      <SelectItem value={undefined}>Select</SelectItem>
+                      <SelectItem value={null}>Select</SelectItem>
                       {users.map((user) => (
                         <SelectItem key={user.id} value={user.id}>
                           {user.name}

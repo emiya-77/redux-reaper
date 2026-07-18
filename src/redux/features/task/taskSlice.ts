@@ -31,13 +31,14 @@ const initialState:InitialState = {
     filter: "all",
 }
 
-type DraftTask = Pick<ITask, "title" | "description" | "priority" | "dueDate">;
+type DraftTask = Pick<ITask, "title" | "description" | "priority" | "dueDate" | "assignedTo">;
 
 const createTask = (taskData: DraftTask) : ITask => {
     return {
+        ...taskData,
         id: nanoid(),
         isComplete: false,
-        ...taskData
+        assignedTo: taskData.assignedTo ? taskData.assignedTo : null,
     };
 };
 
